@@ -9,4 +9,4 @@ module.exports.createCamera = function ( camOptions, testMode = false ) {
     } else {
         return new PiCamera( camOptions );
     }
-}
+};
