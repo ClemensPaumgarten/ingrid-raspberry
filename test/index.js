@@ -6,10 +6,17 @@ const fs            = require( "fs" );
 const rimraf        = require( "rimraf" );
 const bufferEqual   = require( "buffer-equal" );
 const index         = require( "../index" );
+const photoUploader = require( "../photo-uploader.js" );
 
-const photoUploader = require( "../photo-uploader.js");
+let io;
 
-const io = socketIo( index.server );
+before( function() {
+    io = socketIo( index.server );
+} );
+
+after( function() {
+    io.close();
+} );
 
 describe( "photo-uploader", function() {
     const testOutput = `${__dirname}/test/test.jpg`;
@@ -26,11 +33,9 @@ describe( "photo-uploader", function() {
     } );
 
     afterEach( function( done ) {
-        rimraf( `${__dirname}/test` , done );
+        rimraf( `${__dirname}/test`, done );
         photoUploader.stopPhotoProcess();
     } );
-
-
 
     it( "it should take a snapshot and save it to the defined output location", function( done ) {
         const camera = photoUploader.mount(

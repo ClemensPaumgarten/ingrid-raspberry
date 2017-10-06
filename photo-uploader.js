@@ -3,8 +3,7 @@
 const io            = require( "socket.io-client" );
 const ss            = require( "socket.io-stream" );
 const fs            = require( "fs" );
-
-const cameraFactory = require( "./cam-factory.js" );
+const cameraFactory = require( "./camera.js" );
 
 let photoInterval;
 let socket;
@@ -55,11 +54,11 @@ function addSocketEvents () {
 }
 
 
-exports.mount = function( cameraOptions, URL, test, start = true ) {
-    if ( ! cameraOptions ) return;
+exports.mount = function( optons, URL, test, start = true ) {
+    if ( ! optons ) return;
 
-    let camera = cameraFactory.createCamera( cameraOptions, test );
-    snapshotPath = cameraOptions.output;
+    let camera = cameraFactory.createCamera( optons, test );
+    snapshotPath = optons.output;
 
     socket = io.connect( URL );
     addSocketEvents();
