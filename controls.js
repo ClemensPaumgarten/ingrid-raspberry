@@ -1,13 +1,15 @@
 "use strict";
 
-exports.mount = function ( io ) {
-    openConnection( io );
+const io = require( "socket.io-client" );
+
+exports.mount = function() {
+    openConnection();
 };
 
-function openConnection ( io ) {
-    let socket = io.connect( "http://localhost:8080/receive-controls" );
+function openConnection() {
+    let socket = io( "http://localhost:8080/receive-controls" );
 
     socket.on( "next-event", function ( eventData ) {
-        console.log( eventData );
+        console.log( "next-event", eventData );
     } );
 }

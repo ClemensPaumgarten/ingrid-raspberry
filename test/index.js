@@ -6,7 +6,7 @@ const fs            = require( "fs" );
 const rimraf        = require( "rimraf" );
 const bufferEqual   = require( "buffer-equal" );
 const index         = require( "../index" );
-const photoUploader = require( "../photo-uploader.js" );
+const photoUploader = require( "../photo-uploader" );
 
 let io;
 
@@ -76,8 +76,7 @@ describe( "photo-uploader", function() {
         const camera = photoUploader.mount(
             cameraOptions,
             "http://localhost:8090/test-upstream",
-            true,
-            false
+            true
         );
     } );
 } );

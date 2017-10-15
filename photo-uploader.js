@@ -3,14 +3,15 @@
 const io            = require( "socket.io-client" );
 const ss            = require( "socket.io-stream" );
 const fs            = require( "fs" );
-const cameraFactory = require( "./camera.js" );
+const cameraFactory = require( "./camera" );
 
 let photoInterval;
 let socket;
 let snapshotPath;
 let isConnected;
+let upstreamURL;
 
-function takePhoto ( camera, interval = true ) {
+function takePhoto( camera, interval = true ) {
     return camera.snap()
         .then( upload )
         .then( function() {
@@ -18,7 +19,7 @@ function takePhoto ( camera, interval = true ) {
 
                 if ( interval ) {
                     photoInterval = setTimeout( () => {
-                        takePhoto( camera );
+                         takePhoto( camera );
                         resolve();
                     }, 2000 );
 
@@ -30,7 +31,7 @@ function takePhoto ( camera, interval = true ) {
         } );
 }
 
-function upload () {
+function upload() {
     if ( ! isConnected ) return;
 
     return new Promise( function( resolve ) {
@@ -43,34 +44,43 @@ function upload () {
     } );
 }
 
-function addSocketEvents () {
+function addSocketEvents() {
     socket.on( "connect", function () {
         isConnected = true;
     } );
 
     socket.on( "disconnect", function () {
         isConnected = false;
+
+        // try to reconnect to upstream server
+        if ( upstreamURL ) {
+            let interval = setInterval( function() {
+                socket = io( upstreamURL );
+                clearInterval( interval );
+            }, 100 );
+
+        }
     } );
 }
 
 
-exports.mount = function( optons, URL, test, start = true ) {
+exports.mount = function( optons, URL, test ) {
     if ( ! optons ) return;
 
     let camera = cameraFactory.createCamera( optons, test );
-    snapshotPath = optons.output;
 
-    socket = io.connect( URL );
+    snapshotPath = optons.output;
+    upstreamURL = URL;
+
+    socket = io( URL );
     addSocketEvents();
 
-    if ( start ) {
-        takePhoto( camera );
-    }
+    takePhoto( camera );
 
     return camera;
 };
 
-exports.stopPhotoProcess = function () {
+exports.stopPhotoProcess = function() {
     // THAT'S IT - NO MORE PHOTOS
     if ( photoInterval ) {
         clearInterval( photoInterval );
@@ -79,6 +89,5 @@ exports.stopPhotoProcess = function () {
     }
 };
 
-exports.takePhoto = takePhoto;
 exports.takePhoto = takePhoto;
 exports.upload    = upload;
