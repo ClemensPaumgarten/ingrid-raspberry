@@ -10,6 +10,8 @@ const app = express();
 const server = http.Server( app );
 const program = nodeArgs.setOptions();
 
+const serverAddress = "104.236.194.97:6969";
+
 const cameraOptions = {
     mode: "photo",
     output: `${__dirname}/test.jpg`,
@@ -26,7 +28,7 @@ server.listen( 8090, function() {
         // mount photo loader and start upload process
         photoUploader.mount(
             cameraOptions,
-            "http://localhost:8080/upstream",
+            `http://${serverAddress}/upstream`,
             program.test
         );
 
